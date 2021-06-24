@@ -1,0 +1,4 @@
+### YAML configuration for ODDET tool
+--- 
+dataset_dir: /home/rabbit/dataset_test
+output_dir: /home/rabbit/dataset_test/output
