@@ -5,10 +5,23 @@ Opera Dataset Data Extraction Tool
 ## Features
 
 ## Todo
-Usage -
+
+### File Naming
+- Proposed file naming 
 
 ```
-oddet [modality] [experiment_no] [features] 
+[modality]_exp{number}.csv
+
+e.g.
+uwb1_exp001.csv
+wificsi_exp013.csv
 ```
 
-output - file.csv
+### Usage 
+
+- Take in 3 main arguments
+```
+oddet.py [modality] [experiment_no] [features] 
+```
+
+- Output - file.csv
