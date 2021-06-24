@@ -55,12 +55,24 @@ def parse_config():
 
 def oddet_get():
     if (len(args.get) < 2):
-        logging.error("Incorrect number arguments, no dataset specified.")
+        logging.error("Not enough arguments.")
         logging.error("This function takes: oddet.py get [modality] [experiment] [feature 1] ... ")
+    else:
+        pass
+    
+
         return
 
 
+
+
+
+
+
+
+
 ####################################################################
+
 def main():
     print("***** ODDET Extraction Tool *****")
     global args
