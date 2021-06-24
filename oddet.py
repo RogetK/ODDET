@@ -4,15 +4,21 @@ import argparse
 import yaml
 import logging
 
+from liboddet import parse
+
 with open('config.yml', 'r') as f:
     config = yaml.full_load(f)
 
 
 logging.basicConfig(format='[ODDET] [%(levelname)8s]: %(message)s', level=logging.DEBUG) 
-oddet_parser = argparse.ArgumentParser(description="Tool for data extraction of the Opera dataset.")
 
-
-oddet_parser.add_argument('get', nargs='+', help = 'Find and output specified set')
+parser = argparse.ArgumentParser(description="Tool for data extraction of the Opera dataset.")
+subparsers = parser.add_subparsers(help='types of A')
+parser.add_argument('get', nargs='+', help = 'Find and output specified set')
+get_parser = subparsers.add_parser("modality attribute flags")
+get_parser.add_argument('-a', type=int, help='Activity number')
+get_parser.add_argument('-e', type=int, help='Experiment number')
+# b_parser = subparsers.add_parser("B")
 
 ###################
 global args
@@ -68,8 +74,6 @@ def oddet_get():
         dataset = open(set_string, 'r')
         data = yaml.full_load(dataset)
 
-    if (len(args.get) == 2):
-
 
             
              
@@ -90,10 +94,10 @@ def main():
     print("***** ODDET Extraction Tool *****")
     global args
     if len(sys.argv) < 2:
-        oddet_parser.print_help()
+        parser.print_help()
         exit()
     parse_config()
-    args = oddet_parser.parse_args()
+    args = parser.parse_args()
 
     if args.get:
         logging.info("ODDET Getting data:")
