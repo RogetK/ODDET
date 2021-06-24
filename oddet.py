@@ -1,4 +1,5 @@
 import os
+import sys
 import argparse
 import yaml
 import logging
@@ -8,12 +9,13 @@ with open('config.yml', 'r') as f:
 
 
 logging.basicConfig(format='[ODDET] [%(levelname)8s]: %(message)s', level=logging.DEBUG) 
-oddet_parser = argparse.ArgumentParser(description="Tool for data extraction of the Opera dataset."
-)
+oddet_parser = argparse.ArgumentParser(description="Tool for data extraction of the Opera dataset.")
 
-oddet_parser.add_argument('-g', '--get', help = 'Find and output specified set')
+
+oddet_parser.add_argument('get', nargs='+', help = 'Find and output specified set')
 
 ###################
+global args
 global dataset_dir
 global output_dir
 
@@ -51,14 +53,28 @@ def parse_config():
 
 
 
+def oddet_get():
+    if (len(args.get) < 2):
+        logging.error("Incorrect number arguments, no dataset specified.")
+        logging.error("This function takes: oddet.py get [modality] [experiment] [feature 1] ... ")
+        return
 
 
 ####################################################################
 def main():
     print("***** ODDET Extraction Tool *****")
-    oddet_parser.parse_args()
+    global args
+    if len(sys.argv) < 2:
+        oddet_parser.print_help()
+        exit()
     parse_config()
+    args = oddet_parser.parse_args()
 
+    if args.get:
+        logging.info("ODDET Getting data:")
+        oddet_get()
 
 if __name__ == "__main__":
     main()
+    print('')
+    exit()
