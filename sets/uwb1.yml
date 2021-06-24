@@ -3,3 +3,8 @@ identifiers:
   - Timestamp
   - Activity
   - positions
+
+features:
+  CIR: 35
+  FP_index: 1
+  FP: 1

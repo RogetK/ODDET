@@ -54,14 +54,27 @@ def parse_config():
 
 
 def oddet_get():
+    set_dir = dataset_dir+'/'+args.get[1]
+    set_string = 'sets/'+args.get[1]+'.yml'
+
     if (len(args.get) < 2):
         logging.error("Not enough arguments.")
         logging.error("This function takes: oddet.py get [modality] [experiment] [feature 1] ... ")
-    else:
-        pass
-    
-
         return
+
+    logging.info("Finding " + args.get[1] + " dataset")
+    if os.path.isfile(set_string): 
+        logging.info("Dataset found and loading ...")
+        dataset = open(set_string, 'r')
+        data = yaml.full_load(dataset)
+
+    if (len(args.get) == 2):
+
+
+            
+             
+
+    return
 
 
 
