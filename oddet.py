@@ -70,13 +70,17 @@ def oddet_get():
         dataset_string = set_dir + args.m + '_exp' + args.e +'.csv'
         if os.path.isfile(dataset_string):
             logging.info("Dataset found")         
+        else:
+            logging.error("Dataset not found, ensure file location is correct.")
+            return
 
-    # if os.path.isfile(set_cfg_string): 
-    #     logging.info("Dataset descriptor found")
-    #     # data_cfg = open(set_cfg_string, 'r')
-    #     # layout = yaml.full_load(data_cfg)
-    # else:
-    #     logging.error("Dataset descriptor not found, exiting")
+    if os.path.isfile(set_cfg_string): 
+        logging.info("Dataset descriptor found")
+        # data_cfg = open(set_cfg_string, 'r')
+        # layout = yaml.full_load(data_cfg)
+    else:
+        logging.error("Dataset descriptor not found, exiting")
+
 
             
             
