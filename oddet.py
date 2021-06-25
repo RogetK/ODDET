@@ -1,5 +1,29 @@
 #!/usr/bin/env python3
 
+"""
+MIT License
+
+Copyright (c) [year] [fullname]
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+"""
+
 import os, sys, argparse, yaml, logging, pandas, shutil
 from liboddet import parse
 
@@ -22,7 +46,6 @@ parser.add_argument('-o', help='Specify output directory')
 global args
 global dataset_cfg_dir, data_cfg
 global output_dir
-global dataset_extension
 
 ###################
 
@@ -64,7 +87,7 @@ def oddet_get():
         logging.error("Not enough arguments. For usage, use flag -h.")
         return
     
-    global data_cfg
+    global data_cfg 
     descriptor = False
     dataset_string = ""
 
@@ -84,7 +107,7 @@ def oddet_get():
         return
 
     if not (args.e == None):
-        dataset_string = set_dir + args.m + '_exp' + args.e +'.csv'
+        dataset_string = set_dir + args.m + '_exp' + args.e + data_cfg["filetype"]
         if os.path.isfile(dataset_string):
             logging.info("Dataset found")         
         else:
@@ -110,9 +133,10 @@ def oddet_get():
         prompt = input("Do you want to retrieve the whole set? [y/N]: ")
         if prompt == ('y' or 'Y'): 
             shutil.copy2(dataset_string, output_dir)
-            print(output_dir+'/'+args.m+'_exp' + args.e +'.csv')
-            if os.path.isfile(output_dir+'/'+args.m+'_exp' + args.e + '.csv'):
-                logging.info("Dataset written to " + output_dir +". Exiting.")
+            output_file = output_dir+'/'+args.m+'_exp' + args.e + data_cfg["filetype"]
+            if os.path.isfile(output_file):
+                logging.info("Dataset written to " + output_file)
+                logging.info("Exiting.")
         else:
             logging.info("Nothing retrieved. Exiting.")
             return
