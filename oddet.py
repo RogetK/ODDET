@@ -1,9 +1,4 @@
-import os
-import sys
-import argparse
-import yaml
-import logging
-
+import os, sys, argparse, yaml, logging, pandas
 from liboddet import parse
 
 with open('config.yml', 'r') as f:
@@ -15,7 +10,7 @@ logging.basicConfig(format='[ODDET] [%(levelname)8s]: %(message)s', level=loggin
 
 parser = argparse.ArgumentParser(description="Tool for data extraction of the Opera dataset.")
 parser.add_argument('-m', help = 'Modality')
-parser.add_argument('-e', type=int, help='Experiment number')
+parser.add_argument('-e', help='Experiment number')
 parser.add_argument('-f', nargs='+', help='Feature list to be extracted')
 parser.add_argument('-a', help='Activity to be searched')
 
@@ -59,24 +54,32 @@ def parse_config():
 
 
 def oddet_get():
-    set_dir = dataset_dir+'/'+ args.m
-    set_string = 'sets/'+ args.m +'.yml'
-    print(set_dir)
-    print(set_string)
-
     if (len(sys.argv) < 3):
         logging.error("Not enough arguments. For usage, use flag -h.")
         return
 
-    logging.info("Finding " + args.m[1] + " dataset")
-    if os.path.isfile(set_string): 
-        logging.info("Dataset descriptor found and loading info ...")
-        dataset = open(set_string, 'r')
-        data = yaml.full_load(dataset)
+    if not (args.m == None): 
+        set_dir = dataset_dir+'/'+ args.m + '/'
+        set_cfg_string = 'sets/' + args.m + '.yml'
+    else: 
+        logging.error("No modality listed, exiting.")
+        return
 
 
+    if not (args.e == None):
+        dataset_string = set_dir + args.m + '_exp' + args.e +'.csv'
+        if os.path.isfile(dataset_string):
+            logging.info("Dataset found")         
 
-             
+    # if os.path.isfile(set_cfg_string): 
+    #     logging.info("Dataset descriptor found")
+    #     # data_cfg = open(set_cfg_string, 'r')
+    #     # layout = yaml.full_load(data_cfg)
+    # else:
+    #     logging.error("Dataset descriptor not found, exiting")
+
+            
+            
 
     return
 
