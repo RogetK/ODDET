@@ -31,6 +31,7 @@ wificsi_exp013.csv
     features from sets that are not needed.
 
 ```
+oddet.py -m [modality] -e [experiment_no]
 oddet.py -m [modality] -e [experiment_no] -f [features] 
 ```
 

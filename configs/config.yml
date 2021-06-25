@@ -2,3 +2,5 @@
 --- 
 dataset_dir: /home/rabbit/dataset_test
 output_dir: ./output
+filetypes: 
+  - .csv
