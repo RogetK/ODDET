@@ -21,7 +21,7 @@ wificsi_exp013.csv
 
 - Take in 3 main arguments
 ```
-oddet.py [modality] [experiment_no] [features] 
+oddet.py get -m [modality] -e [experiment_no] -f [features] 
 ```
 
 - Output - file.csv

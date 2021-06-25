@@ -14,11 +14,11 @@ logging.basicConfig(format='[ODDET] [%(levelname)8s]: %(message)s', level=loggin
 
 parser = argparse.ArgumentParser(description="Tool for data extraction of the Opera dataset.")
 subparsers = parser.add_subparsers(help='types of A')
-parser.add_argument('get', nargs='+', help = 'Find and output specified set')
-get_parser = subparsers.add_parser("modality attribute flags")
-get_parser.add_argument('-a', type=int, help='Activity number')
-get_parser.add_argument('-e', type=int, help='Experiment number')
-# b_parser = subparsers.add_parser("B")
+parser.add_argument('get', nargs='+', help = 'Find and output specified set, requires at least one additional flag')
+parser.add_argument('-m', help = 'Modality')
+parser.add_argument('-e', type=int, help='Experiment number')
+parser.add_argument('-f', nargs='+', help='Feature list to be extracted')
+parser.add_argument('-a', help='Activity to be searched')
 
 ###################
 global args
