@@ -105,7 +105,7 @@ def oddet_get():
             return
             
 
-    if (args.f == None) and (descriptor == False):
+    if (args.f == None) and (args.d == None):
         logging.info("Retrieving entire set of " + args.m + '_exp' + args.e)
         prompt = input("Do you want to retrieve the whole set? [y/N]: ")
         if prompt == ('y' or 'Y'): 
@@ -116,11 +116,7 @@ def oddet_get():
         else:
             logging.info("Nothing retrieved. Exiting.")
             return
-    
-    elif (args.f == None) and (descriptor == True):
-        logging.info("Retrieving set based on descriptor rules")
-        input("Do you want to retrieve based on descriptors? [Y/n]: ")
-         
+
     elif (args.f != None):
         logging.info("Retrieving set of features")
 
