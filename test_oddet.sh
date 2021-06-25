@@ -1,3 +1,4 @@
 #!/bin/bash
 
-python3 oddet.py get uwb1 1 fp_index
+python3 oddet.py -m uwb1 -e 1 -f FP_int
+

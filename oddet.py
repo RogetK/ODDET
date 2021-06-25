@@ -12,9 +12,8 @@ with open('config.yml', 'r') as f:
 
 logging.basicConfig(format='[ODDET] [%(levelname)8s]: %(message)s', level=logging.DEBUG) 
 
+
 parser = argparse.ArgumentParser(description="Tool for data extraction of the Opera dataset.")
-subparsers = parser.add_subparsers(help='types of A')
-parser.add_argument('get', nargs='+', help = 'Find and output specified set, requires at least one additional flag')
 parser.add_argument('-m', help = 'Modality')
 parser.add_argument('-e', type=int, help='Experiment number')
 parser.add_argument('-f', nargs='+', help='Feature list to be extracted')
@@ -60,22 +59,23 @@ def parse_config():
 
 
 def oddet_get():
-    set_dir = dataset_dir+'/'+args.get[1]
-    set_string = 'sets/'+args.get[1]+'.yml'
+    set_dir = dataset_dir+'/'+ args.m
+    set_string = 'sets/'+ args.m +'.yml'
+    print(set_dir)
+    print(set_string)
 
-    if (len(args.get) < 2):
-        logging.error("Not enough arguments.")
-        logging.error("This function takes: oddet.py get [modality] [experiment] [feature 1] ... ")
+    if (len(sys.argv) < 3):
+        logging.error("Not enough arguments. For usage, use flag -h.")
         return
 
-    logging.info("Finding " + args.get[1] + " dataset")
+    logging.info("Finding " + args.m[1] + " dataset")
     if os.path.isfile(set_string): 
-        logging.info("Dataset found and loading ...")
+        logging.info("Dataset descriptor found and loading info ...")
         dataset = open(set_string, 'r')
         data = yaml.full_load(dataset)
 
 
-            
+
              
 
     return
@@ -99,9 +99,8 @@ def main():
     parse_config()
     args = parser.parse_args()
 
-    if args.get:
-        logging.info("ODDET Getting data:")
-        oddet_get()
+    logging.info("ODDET Getting data:")
+    oddet_get()
 
 if __name__ == "__main__":
     main()
