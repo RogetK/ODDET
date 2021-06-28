@@ -2,3 +2,9 @@
 name: uwb1
 filetype: .csv
 
+identifiers:
+  - timestamp
+  - activity
+  - exp_no
+  - person_id
+  - room_no

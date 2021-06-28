@@ -25,6 +25,7 @@ SOFTWARE.
 """
 
 import os, sys, argparse, yaml, logging, pandas, shutil
+from typing import final
 from liboddet import parse
 
 from tkinter import *
@@ -45,6 +46,7 @@ parser.add_argument('-e', nargs='+', help='Experiment number')
 parser.add_argument('-f', nargs='+', help='Feature list to be extracted')
 
 ###################
+
 global args
 global dataset_cfg_dir 
 global data_cfg 
@@ -157,9 +159,44 @@ def read_config():
 
 
 
-def complex_retrieval_f():
-    logging.info("Retrieving specified features")
+def oddet_e_f():
+    global data_cfg
+
+    for m in args.m: 
+        set_dir = dataset_cfg_dir+'/'+ m + '/'
+        set_cfg_string = 'configs/sets/' + m + '.yml'
+
+        if os.path.isfile(set_cfg_string) and os.path.exists(set_dir): 
+            logging.info("Modality config and dataset found for " + m)
+            temp_cfg = open(set_cfg_string, 'r')
+            data_cfg = yaml.full_load(temp_cfg)
+        else:
+            logging.info("Modality " + m + " not found, skipping")
+            continue
+
+        final_output_dir = output_dir + '/' + m + "_features"
+        if os.path.isdir(final_output_dir):
+            shutil.rmtree(final_output_dir)
+        os.mkdir(final_output_dir)
+
+        for e in args.e:
+            dataset_string = set_dir + m +'_exp' + e + data_cfg["filetype"]
+            if os.path.isfile(dataset_string):
+                logging.info("Dataset found for " + dataset_string)
+            else:
+                logging.info("Dataset not found, skipping")
+                continue
+        
+           
+            if data_cfg["filetype"] == '.csv':
+                filename = m + '_exp' + e + data_cfg["filetype"]
+                final_output = final_output_dir + '/' + filename
+                print(final_output)
+                processed_ef = pandas.read_csv(dataset_string, usecols=data_cfg["identifiers"] + args.f, low_memory=True)
+                processed_ef.to_csv(final_output)
+                logging.info("Wrote successfully to " + final_output)
     return
+
 
 def oddet_m():
     global data_cfg
@@ -186,8 +223,6 @@ def oddet_m():
 
     return
         
- 
-       
 
 
 def oddet_m_e():
@@ -261,10 +296,9 @@ def oddet_d():
             for file in os.listdir(set_dir):
                 processed = pandas.read_csv(set_dir + '/' + file, 
                     usecols=descriptor["identifiers"] + descriptor["features"], low_memory=True)
-                processed.to_csv(file)
                 final_output = final_output_dir + '/' + file
-                shutil.move(file, final_output)
-                logging.info("Wrote " + final_output + " succesfully")
+                processed.to_csv(final_output)
+                logging.info("Wrote successfully to " + final_output)
 
     return
 
@@ -309,6 +343,16 @@ def oddet_modality_get():
         else:
             logging.info("Nothing to do. Exiting")
             return    
+    
+    if (args.d is not True) and (args.e is not None) and (args.f is not None):
+        input_char = input("Retrieve features for modalities " + str(args.m) + " from experiments " + str(args.e) + " ? [y/N]: ")
+        if input_char == ('y' or 'Y'):
+            oddet_e_f()
+        else:
+            logging.info("Nothing to do. Exiting")
+            return
+        
+
 
     return
 
@@ -326,19 +370,15 @@ def main():
         exit()
 
     args = parser.parse_args()
-
     if args.config is True:
         configure()
-    
     if args.clean is True:
         oddet_clean()
-
     read_config()
 
     if args.m is not None:
         oddet_modality_get()
 
-    # oddet_get()
 
 if __name__ == "__main__":
     main()
