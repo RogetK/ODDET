@@ -1,6 +1,6 @@
 # ODDET - Opera Dataset Data Extraction Tool
 ## Description
-Opera Dataset Data Extraction Tool
+Data Extraction Tool for the Opera multi modality dataset for Wireless Sensing
 
 ## Features
 
@@ -29,6 +29,15 @@ wificsi_exp013.csv
     retrieving a small number of select features. However by using the YAML configuration you can 
     specify large groups of features to output with specific identifiers. This way you can prune out 
     features from sets that are not needed.
+
+- Flags currently include:
+    - -config configure the dataset directory and the output directory via a selector
+    - -clean clears the entire output folder
+
+    - -m modalities 
+    - -e experiment numbers
+    - -f features
+    - -d descriptor usage
 
 ```
 oddet.py -m [modality] -e [experiment_no]
