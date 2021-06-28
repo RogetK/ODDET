@@ -1,6 +1,2 @@
-### YAML configuration for ODDET tool
---- 
-dataset_dir: /home/rabbit/dataset_test
+dataset_dir: C:/Users/Roget/Desktop/dataset
 output_dir: ./output
-filetypes: 
-  - .csv

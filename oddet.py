@@ -27,6 +27,9 @@ SOFTWARE.
 import os, sys, argparse, yaml, logging, pandas, shutil
 from liboddet import parse
 
+from tkinter import *
+from tkinter import Tk, filedialog
+
 with open('configs/config.yml', 'r') as f:
     oddet_config = yaml.full_load(f)
 
@@ -35,6 +38,9 @@ logging.basicConfig(format='[ODDET] [%(levelname)8s]: %(message)s', level=loggin
 
 
 parser = argparse.ArgumentParser(description="Tool for data extraction of the Opera dataset.")
+
+parser.add_argument('-config', action='store_true', help="Configure directories")
+
 parser.add_argument('-m', help = 'Modality')
 parser.add_argument('-e', help='Experiment number')
 parser.add_argument('-f', nargs='+', help='Feature list to be extracted')
@@ -47,10 +53,52 @@ global args
 global dataset_cfg_dir, data_cfg
 global output_dir
 
+root = Tk()
+
 ###################
 
-def parse_config():
+def configure():
+    if len(sys.argv) > 3:
+        logging.error("Too many arguments, -config is standalone.")
+        logging.error("Exiting.")
+        exit()
+
+    logging.info("Configuring Oddet")
+
+    root.withdraw()
+    root.attributes('-topmost', True)
+
+    print("\n[1]:\tConfigure dataset directory")
+    print("[2]:\tConfigure output directory\n")
+
+    p = input(">> Select one of the numbers above: ")
+    print('')
+    if p == '1':
+        logging.info("Selecting dataset location")
+        dataset_directory = filedialog.askdirectory()
+        oddet_config["dataset_dir"] = dataset_directory
+        print(oddet_config["dataset_dir"])
+
+        with open('configs/config.yml', 'w') as f:
+            yaml.dump(oddet_config, f)
+
+    elif p == '2':
+        logging.info("Selecting output directory")
+        output_directory = filedialog.askdirectory()
+        print(output_directory)
+
+    else:
+        logging.error("No option selected, exiting.")
+
+    exit()
+
+
+
+#############################################################################
+
+def read_config():
     global dataset_cfg_dir, output_dir
+
     dataset_cfg_dir = oddet_config["dataset_dir"]
     output_dir = oddet_config["output_dir"]
 
@@ -96,7 +144,7 @@ def oddet_get():
         set_cfg_string = 'configs/sets/' + args.m + '.yml'
     else: 
         logging.error("No modality listed, exiting.")
-        return
+        exit()
 
     if os.path.isfile(set_cfg_string): 
         logging.info("Dataset config found")
@@ -104,7 +152,7 @@ def oddet_get():
         data_cfg = yaml.full_load(temp_cfg)
     else:
         logging.error("No dataset config specified. Exiting.")
-        return
+        exit()
 
     if not (args.e == None):
         dataset_string = set_dir + args.m + '_exp' + args.e + data_cfg["filetype"]
@@ -112,7 +160,7 @@ def oddet_get():
             logging.info("Dataset found")         
         else:
             logging.error("Dataset for not found, ensure file location is correct. Exiting.")
-            return
+            exit()
 
     else: 
         logging.info("No experiments specified")
@@ -125,7 +173,11 @@ def oddet_get():
             shutil.copytree(set_dir, copy_dir)
             if os.path.exists(copy_dir):
                 logging.info("Copy successful. Exiting.")
-            return
+            exit() 
+        else:
+            logging.info("Nothing to do. Exiting.")
+            exit()
+        
             
 
     if (args.f == None) and (args.d == None):
@@ -162,10 +214,13 @@ def main():
     if len(sys.argv) < 2:
         parser.print_help()
         exit()
-    parse_config()
+
     args = parser.parse_args()
 
-    logging.info("ODDET Getting data:")
+    if args.config is True:
+        configure()
+
+    read_config()
     oddet_get()
 
 if __name__ == "__main__":
