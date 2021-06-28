@@ -1,10 +1,12 @@
 ---
 identifiers:
-  - Timestamp
-  - Activity
-  - positions
+  - timestamp
+  - activity
+  - tx_id
+  - rx_id
+
 
 features:
-  CIR: 35
-  FP_index: 1
-  FP: 1
+  - fp_index
+  - fp_amp1
+  - fp_amp2

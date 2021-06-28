@@ -156,10 +156,6 @@ def read_config():
 #############################################################################
 
 
-def complex_retrieval_d():
-    logging.info("Retrieving based on descriptor")
-    return
-
 
 def complex_retrieval_f():
     logging.info("Retrieving specified features")
@@ -179,6 +175,7 @@ def oddet_m():
         else:
             logging.info("Modality " + m + " not found, skipping")
             continue
+
 
         final_output_dir = output_dir + '/' + m
         if os.path.isdir(final_output_dir):
@@ -228,6 +225,50 @@ def oddet_m_e():
         logging.info("Sets copied for " + m)
     return
 
+
+def oddet_d():
+    logging.info("Retrieving based on descriptors")
+    global data_cfg
+
+    for m in args.m:
+        set_dir = dataset_cfg_dir+'/'+ m + '/'
+        set_cfg_string = 'configs/sets/' + m + '.yml'
+
+        if os.path.isfile(set_cfg_string) and os.path.exists(set_dir): 
+            logging.info("Modality config and dataset found for " + m)
+            temp_cfg = open(set_cfg_string, 'r')
+            data_cfg = yaml.full_load(temp_cfg)
+        else:
+            logging.info("Modality " + m + " not found, skipping")
+            continue
+
+        descriptor_path = 'descriptors/' + m + '.yml'
+        descriptor = None
+        if os.path.isfile(descriptor_path):
+            logging.info("Descriptor found for " + m)
+            with open(descriptor_path, 'r') as des:
+                descriptor = yaml.full_load(des)
+        else:
+            logging.info("No descriptor found. Skipping.")
+            continue
+
+        final_output_dir = output_dir + '/' + m +"_descriptor"
+        if os.path.isdir(final_output_dir):
+            shutil.rmtree(final_output_dir)
+        os.mkdir(final_output_dir)
+
+        if data_cfg["filetype"] == '.csv':
+            for file in os.listdir(set_dir):
+                processed = pandas.read_csv(set_dir + '/' + file, 
+                    usecols=descriptor["identifiers"] + descriptor["features"], low_memory=True)
+                processed.to_csv(file)
+                final_output = final_output_dir + '/' + file
+                shutil.move(file, final_output)
+                logging.info("Wrote " + final_output + " succesfully")
+
+    return
+
+
  
 def oddet_modality_get():
     if (len(sys.argv) < 3):
@@ -261,76 +302,14 @@ def oddet_modality_get():
             logging.info("Nothing to do. Exiting")
             return
 
-    if args.d is True:
-        complex_retrieval_d()
-
-
-    '''
-    # Selecting modality
-    if args.m is not None: 
-        set_dir = dataset_cfg_dir+'/'+ args.m + '/'
-        set_cfg_string = 'configs/sets/' + args.m + '.yml'
-    else: 
-        logging.error("No modality selected, exiting.")
-        exit()
-
-    # Finding modality config
-    if os.path.isfile(set_cfg_string): 
-        logging.info("Dataset config found")
-        temp_cfg = open(set_cfg_string, 'r')
-        data_cfg = yaml.full_load(temp_cfg)
-    else:
-        logging.error("No dataset config specified. Exiting.")
-        exit()
-
-    # Retrieve based on dataset descriptor
-    if args.d is True:
-        complex_retrieval_d()
-        exit()
-
-    # Retrieve based on experiment number
-    if args.e is not None:
-        dataset_string = set_dir + args.m + '_exp' + args.e + data_cfg["filetype"]
-        if os.path.isfile(dataset_string):
-            logging.info("Dataset found")         
+    if (args.d is True):
+        input_char = input("Do you want to retrieve from " + str(args.m) + " from descriptors? [y/N]: ")
+        if input_char == ('y' or 'Y'):
+            oddet_d()
         else:
-            logging.error("Dataset for not found, ensure file location is correct. Exiting.")
-            exit()
-    else: 
-        logging.info("No experiments specified")
-        prompt = input ("Do you want to retrieve all sets from " + args.m + "? [y/N]: ")
-        if (prompt == ('y' or 'Y')):
-            logging.info("Copying set for entire modality")
-            copy_dir = output_dir + '/' + args.m
-            if os.path.exists(copy_dir):
-                shutil.rmtree(copy_dir)
-            shutil.copytree(set_dir, copy_dir)
-            if os.path.exists(copy_dir):
-                logging.info("Copy successful. Exiting.")
-            exit() 
-        else:
-            logging.info("Nothing to do. Exiting.")
-            exit()
-        
-            
-    # Retrieve if only modality is selected
-    # Retrieves the entire set for the modality
-    if (args.f is None) and (args.d is not True) and (args.e is not None):
-        logging.info("Retrieving entire set of " + args.m + '_exp' + args.e)
-        prompt = input("Do you want to retrieve the whole set? [y/N]: ")
-        if prompt == ('y' or 'Y'): 
-            shutil.copy2(dataset_string, output_dir)
-            output_file = output_dir+'/'+args.m+'_exp' + args.e + data_cfg["filetype"]
-            if os.path.isfile(output_file):
-                logging.info("Dataset written to " + output_file)
-                logging.info("Exiting.")
-        else:
-            logging.info("Nothing retrieved. Exiting.")
-            exit()
+            logging.info("Nothing to do. Exiting")
+            return    
 
-    elif (args.f is not  None) and (args.d is not True):
-        complex_retrieval_f()
-    '''
     return
 
 
