@@ -31,6 +31,10 @@ from liboddet import parse
 from tkinter import *
 from tkinter import Tk, filedialog
 
+import h5py
+import numpy as np
+
+
 
 logging.basicConfig(format='[ODDET] [%(levelname)8s]: %(message)s', level=logging.DEBUG) 
 
@@ -309,6 +313,9 @@ def oddet_m_e_f():
                 processed_ef = pandas.read_csv(dataset_string, usecols=data_cfg["identifiers"] + args.f, low_memory=True)
                 processed_ef.to_csv(final_output)
                 logging.info("Wrote successfully to " + final_output)
+
+            if data_cfg["filetype"] == '.mat':
+                logging.info("mat file")
     return
 
 

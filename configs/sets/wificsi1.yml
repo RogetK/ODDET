@@ -1,0 +1,10 @@
+---
+name: wificsi1 
+filetype: .mat
+
+identifiers:
+  - timestamp
+  - activity
+  - exp_no
+  - person_id
+  - room_no
