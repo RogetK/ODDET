@@ -165,6 +165,33 @@ def complex_retrieval_f():
     logging.info("Retrieving specified features")
     return
 
+def oddet_m():
+    global data_cfg
+
+    for m in args.m: 
+        set_dir = dataset_cfg_dir+'/'+ m + '/'
+        set_cfg_string = 'configs/sets/' + m + '.yml'
+
+        if os.path.isfile(set_cfg_string) and os.path.exists(set_dir): 
+            logging.info("Modality config and dataset found for " + m)
+            temp_cfg = open(set_cfg_string, 'r')
+            data_cfg = yaml.full_load(temp_cfg)
+        else:
+            logging.info("Modality " + m + " not found, skipping")
+            continue
+
+        final_output_dir = output_dir + '/' + m
+        if os.path.isdir(final_output_dir):
+            shutil.rmtree(final_output_dir)
+        shutil.copytree(set_dir, final_output_dir)
+
+        logging.info("Finished copying modality data")
+
+    return
+        
+ 
+       
+
 
 def oddet_m_e():
     global data_cfg
@@ -215,6 +242,17 @@ def oddet_modality_get():
         logging.info("No modality selected")
         return
     
+    if (args.e is None) and (args.d is not True) and (args.f is None):
+        logging.info("Only modality selected")
+        input_char = input("Do you want to retrieve all set from " + str(args.m) + " ? [y/N]: ")
+        if input_char == ('y' or 'Y'):
+            oddet_m()
+            return
+        else:
+            logging.info("Nothing to do. Exiting")
+            return
+
+
     if (args.m is not None) and (args.e is not None) and (args.d is not True) and (args.f is None):
         input_char = input("Do you want to retrieve all sets from " + str(args.m) + " from experiments " + str(args.e) + " ? [y/N]: ")
         if input_char == ('y' or 'Y'):
