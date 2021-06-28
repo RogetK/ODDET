@@ -30,9 +30,6 @@ from liboddet import parse
 from tkinter import *
 from tkinter import Tk, filedialog
 
-with open('configs/config.yml', 'r') as f:
-    oddet_config = yaml.full_load(f)
-
 
 logging.basicConfig(format='[ODDET] [%(levelname)8s]: %(message)s', level=logging.DEBUG) 
 
@@ -40,6 +37,7 @@ logging.basicConfig(format='[ODDET] [%(levelname)8s]: %(message)s', level=loggin
 parser = argparse.ArgumentParser(description="Tool for data extraction of the Opera dataset.")
 
 parser.add_argument('-config', action='store_true', help="Configure directories")
+parser.add_argument('-clear', action='store_true', help='Clear output data')
 
 parser.add_argument('-m', help = 'Modality')
 parser.add_argument('-e', help='Experiment number')
@@ -50,10 +48,7 @@ parser.add_argument('-o', help='Specify output directory')
 
 ###################
 global args
-global dataset_cfg_dir, data_cfg
-global output_dir
-
-root = Tk()
+global dataset_cfg_dir, data_cfg, output_dir
 
 ###################
 
@@ -65,31 +60,46 @@ def configure():
 
     logging.info("Configuring Oddet")
 
-    root.withdraw()
-    root.attributes('-topmost', True)
+    with open('configs/config.yml', 'r') as f:
+        oddet_config = yaml.full_load(f)
 
     print("\n[1]:\tConfigure dataset directory")
     print("[2]:\tConfigure output directory\n")
 
     p = input(">> Select one of the numbers above: ")
     print('')
+
+    root = Tk()
+    root.withdraw()
+    root.attributes('-topmost', True)
+
     if p == '1':
         logging.info("Selecting dataset location")
         dataset_directory = filedialog.askdirectory()
-        oddet_config["dataset_dir"] = dataset_directory
-        print(oddet_config["dataset_dir"])
-
-        with open('configs/config.yml', 'w') as f:
-            yaml.dump(oddet_config, f)
+        if dataset_directory != '':
+            oddet_config["dataset_dir"] = dataset_directory
+            print(oddet_config["dataset_dir"])
+            with open('configs/config.yml', 'w') as f:
+                yaml.dump(oddet_config, f)
+        else:
+            logging.error("No directory selected. Exiting.")
+            exit()
 
     elif p == '2':
         logging.info("Selecting output directory")
         output_directory = filedialog.askdirectory()
-        print(output_directory)
+        if output_directory != '':
+            oddet_config["output_dir"] = output_directory
+            print(oddet_config["output_dir"])
+            with open('configs/config.yml', 'w') as f:
+                yaml.dump(oddet_config, f)
+        else:
+            logging.error("No directory selected. Exiting.")
+            exit()
 
     else:
-        logging.error("No option selected, exiting.")
-
+        logging.error("No directory selected. Exiting.")
+        exit()
     exit()
 
 
@@ -98,6 +108,9 @@ def configure():
 
 def read_config():
     global dataset_cfg_dir, output_dir
+
+    with open('configs/config.yml', 'r') as f:
+        oddet_config = yaml.full_load(f)
 
     dataset_cfg_dir = oddet_config["dataset_dir"]
     output_dir = oddet_config["output_dir"]
@@ -121,10 +134,10 @@ def read_config():
                 logging.info("Directory created")
             else: 
                 logging.error("Output directory not created")
-                return
+                exit()
         else:
             logging.info("Output directory not created")
-            return
+            exit()
 
 
 #############################################################################
@@ -191,7 +204,7 @@ def oddet_get():
                 logging.info("Exiting.")
         else:
             logging.info("Nothing retrieved. Exiting.")
-            return
+            exit()
 
     elif (args.f != None):
         logging.info("Retrieving set of features")
