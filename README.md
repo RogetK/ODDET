@@ -31,13 +31,13 @@ wificsi_exp013.csv
     features from sets that are not needed.
 
 - Flags currently include:
-    - -config configure the dataset directory and the output directory via a selector
-    - -clean clears the entire output folder
+    - -config: configure the dataset directory and the output directory via a selector
+    - -clean: clears the entire output folder
 
-    - -m modalities 
-    - -e experiment numbers
-    - -f features
-    - -d descriptor usage
+    - -m: modalities 
+    - -e: experiment numbers
+    - -f: features
+    - -d: descriptor usage
 
 ```
 oddet.py -m [modality] -e [experiment_no]
