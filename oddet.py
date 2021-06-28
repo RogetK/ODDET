@@ -157,46 +157,9 @@ def read_config():
 
 #############################################################################
 
-
-
-def oddet_e_f():
-    global data_cfg
-
-    for m in args.m: 
-        set_dir = dataset_cfg_dir+'/'+ m + '/'
-        set_cfg_string = 'configs/sets/' + m + '.yml'
-
-        if os.path.isfile(set_cfg_string) and os.path.exists(set_dir): 
-            logging.info("Modality config and dataset found for " + m)
-            temp_cfg = open(set_cfg_string, 'r')
-            data_cfg = yaml.full_load(temp_cfg)
-        else:
-            logging.info("Modality " + m + " not found, skipping")
-            continue
-
-        final_output_dir = output_dir + '/' + m + "_features"
-        if os.path.isdir(final_output_dir):
-            shutil.rmtree(final_output_dir)
-        os.mkdir(final_output_dir)
-
-        for e in args.e:
-            dataset_string = set_dir + m +'_exp' + e + data_cfg["filetype"]
-            if os.path.isfile(dataset_string):
-                logging.info("Dataset found for " + dataset_string)
-            else:
-                logging.info("Dataset not found, skipping")
-                continue
-        
-           
-            if data_cfg["filetype"] == '.csv':
-                filename = m + '_exp' + e + data_cfg["filetype"]
-                final_output = final_output_dir + '/' + filename
-                print(final_output)
-                processed_ef = pandas.read_csv(dataset_string, usecols=data_cfg["identifiers"] + args.f, low_memory=True)
-                processed_ef.to_csv(final_output)
-                logging.info("Wrote successfully to " + final_output)
-    return
-
+'''
+Gets all data for specified modalities
+'''
 
 def oddet_m():
     global data_cfg
@@ -223,7 +186,9 @@ def oddet_m():
 
     return
         
-
+'''
+Gets all experiments for specified modalities
+'''
 
 def oddet_m_e():
     global data_cfg
@@ -261,7 +226,11 @@ def oddet_m_e():
     return
 
 
-def oddet_d():
+'''
+Generates output based on provided descriptors for specified modality
+'''
+
+def oddet_m_d():
     logging.info("Retrieving based on descriptors")
     global data_cfg
 
@@ -294,15 +263,87 @@ def oddet_d():
 
         if data_cfg["filetype"] == '.csv':
             for file in os.listdir(set_dir):
+                newfile = os.path.splitext(file)[0] + "_descriptor" + data_cfg["filetype"]
                 processed = pandas.read_csv(set_dir + '/' + file, 
                     usecols=descriptor["identifiers"] + descriptor["features"], low_memory=True)
-                final_output = final_output_dir + '/' + file
+                final_output = final_output_dir + '/' + newfile
                 processed.to_csv(final_output)
                 logging.info("Wrote successfully to " + final_output)
 
     return
 
+'''
+Gets features requested from experiments for specified modalities
+'''
+def oddet_m_e_f():
+    global data_cfg
 
+    for m in args.m: 
+        set_dir = dataset_cfg_dir+'/'+ m + '/'
+        set_cfg_string = 'configs/sets/' + m + '.yml'
+
+        if os.path.isfile(set_cfg_string) and os.path.exists(set_dir): 
+            logging.info("Modality config and dataset found for " + m)
+            temp_cfg = open(set_cfg_string, 'r')
+            data_cfg = yaml.full_load(temp_cfg)
+        else:
+            logging.info("Modality " + m + " not found, skipping")
+            continue
+
+        final_output_dir = output_dir + '/' + m + "_exp_features"
+        if os.path.isdir(final_output_dir):
+            shutil.rmtree(final_output_dir)
+        os.mkdir(final_output_dir)
+
+        for e in args.e:
+            dataset_string = set_dir + m +'_exp' + e + data_cfg["filetype"]
+            if os.path.isfile(dataset_string):
+                logging.info("Dataset found for " + dataset_string)
+            else:
+                logging.info("Dataset not found, skipping")
+                continue
+           
+            if data_cfg["filetype"] == '.csv':
+                filename = m + '_exp' + e + data_cfg["filetype"]
+                final_output = final_output_dir + '/' + filename
+                processed_ef = pandas.read_csv(dataset_string, usecols=data_cfg["identifiers"] + args.f, low_memory=True)
+                processed_ef.to_csv(final_output)
+                logging.info("Wrote successfully to " + final_output)
+    return
+
+
+
+def oddet_m_f():
+    for m in args.m: 
+        set_dir = dataset_cfg_dir+'/'+ m + '/'
+        set_cfg_string = 'configs/sets/' + m + '.yml'
+
+        if os.path.isfile(set_cfg_string) and os.path.exists(set_dir): 
+            logging.info("Modality config and dataset found for " + m)
+            temp_cfg = open(set_cfg_string, 'r')
+            data_cfg = yaml.full_load(temp_cfg)
+        else:
+            logging.info("Modality " + m + " not found, skipping")
+            continue
+
+        final_output_dir = output_dir + '/' + m + "_features"
+        if os.path.isdir(final_output_dir):
+            shutil.rmtree(final_output_dir)
+        os.mkdir(final_output_dir)
+
+        if data_cfg["filetype"] == '.csv':
+            for file in os.listdir(set_dir):
+                newfile = os.path.splitext(file)[0] + '_features' + data_cfg["filetype"]
+                final_output = final_output_dir + '/' + newfile
+                processed = pandas.read_csv(set_dir + '/' + file, usecols=data_cfg["identifiers"] + args.f, low_memory=True)
+                processed.to_csv(final_output)
+                logging.info("Wrote successfully to " + final_output)
+    return
+
+
+'''
+General modality retrieval function calls the above functions
+'''
  
 def oddet_modality_get():
     if (len(sys.argv) < 3):
@@ -339,7 +380,7 @@ def oddet_modality_get():
     if (args.d is True):
         input_char = input("Do you want to retrieve from " + str(args.m) + " from descriptors? [y/N]: ")
         if input_char == ('y' or 'Y'):
-            oddet_d()
+            oddet_m_d()
         else:
             logging.info("Nothing to do. Exiting")
             return    
@@ -347,16 +388,19 @@ def oddet_modality_get():
     if (args.d is not True) and (args.e is not None) and (args.f is not None):
         input_char = input("Retrieve features for modalities " + str(args.m) + " from experiments " + str(args.e) + " ? [y/N]: ")
         if input_char == ('y' or 'Y'):
-            oddet_e_f()
+            oddet_m_e_f()
         else:
             logging.info("Nothing to do. Exiting")
             return
-        
-
-
+    
+    if (args.d is not True) and (args.e is None) and (args.f is not None):
+        input_char = input("Retrieve features for all data for " + str(args.m) + " ? [y/N]: ")
+        if input_char == ('y' or 'Y'):
+            oddet_m_f()
+        else:
+            logging.info("Nothing to do. Exiting.")
+            return
     return
-
-
 
 
 
