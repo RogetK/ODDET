@@ -38,10 +38,10 @@ parser = argparse.ArgumentParser(description="Tool for data extraction of the Op
 
 parser.add_argument('-config', action='store_true', help="Configure directories")
 parser.add_argument('-clean', action='store_true', help='Clean output directory')
-parser.add_argument('-m', help = 'Modality')
+parser.add_argument('-m', nargs='+', help = 'Modality')
 
 parser.add_argument('-d', action='store_true', help='Descriptor to extract according to')
-parser.add_argument('-e', help='Experiment number')
+parser.add_argument('-e', nargs='+', help='Experiment number')
 parser.add_argument('-f', nargs='+', help='Feature list to be extracted')
 
 ###################
@@ -166,6 +166,42 @@ def complex_retrieval_f():
     return
 
 
+def oddet_m_e():
+    global data_cfg
+
+    for m in args.m:
+        set_dir = dataset_cfg_dir+'/'+ m + '/'
+        set_cfg_string = 'configs/sets/' + m + '.yml'
+
+        if os.path.isfile(set_cfg_string) and os.path.exists(set_dir): 
+            logging.info("Modality config and dataset found for " + m)
+            temp_cfg = open(set_cfg_string, 'r')
+            data_cfg = yaml.full_load(temp_cfg)
+        else:
+            logging.info("Modality " + m + " not found, skipping")
+            continue
+
+        for e in args.e:
+            dataset_string = set_dir + m +'_exp' + e + data_cfg["filetype"]
+            print(dataset_string)
+            if os.path.isfile(dataset_string):
+                logging.info("Dataset found for " + dataset_string)
+            else:
+                logging.info("Dataset not found, skipping")
+                continue
+            
+            final_ouput_dir = output_dir + '/' + 'exp' + e
+            logging.info("Generating final output")
+            if os.path.isdir(final_ouput_dir):
+                shutil.rmtree(final_ouput_dir)
+            else:
+                os.path.os.mkdir(final_ouput_dir)
+                shutil.copy2(dataset_string, final_ouput_dir)
+
+        logging.info("Sets copied for " + m)
+    return
+
+ 
 def oddet_modality_get():
     if (len(sys.argv) < 3):
         logging.error("Not enough arguments. For usage, use flag -h.")
@@ -175,6 +211,23 @@ def oddet_modality_get():
     descriptor = False
     dataset_string = ""
 
+    if args.m is None:
+        logging.info("No modality selected")
+        return
+    
+    if (args.m is not None) and (args.e is not None) and (args.d is not True) and (args.f is None):
+        input_char = input("Do you want to retrieve all sets from " + str(args.m) + " from experiments " + str(args.e) + " ? [y/N]: ")
+        if input_char == ('y' or 'Y'):
+            oddet_m_e()
+        else:
+            logging.info("Nothing to do. Exiting")
+            return
+
+    if args.d is True:
+        complex_retrieval_d()
+
+
+    '''
     # Selecting modality
     if args.m is not None: 
         set_dir = dataset_cfg_dir+'/'+ args.m + '/'
@@ -239,7 +292,7 @@ def oddet_modality_get():
 
     elif (args.f is not  None) and (args.d is not True):
         complex_retrieval_f()
-
+    '''
     return
 
 
@@ -268,7 +321,7 @@ def main():
     if args.m is not None:
         oddet_modality_get()
 
-    oddet_get()
+    # oddet_get()
 
 if __name__ == "__main__":
     main()
