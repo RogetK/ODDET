@@ -37,20 +37,33 @@ logging.basicConfig(format='[ODDET] [%(levelname)8s]: %(message)s', level=loggin
 parser = argparse.ArgumentParser(description="Tool for data extraction of the Opera dataset.")
 
 parser.add_argument('-config', action='store_true', help="Configure directories")
-parser.add_argument('-clear', action='store_true', help='Clear output data')
-
+parser.add_argument('-clean', action='store_true', help='Clean output directory')
 parser.add_argument('-m', help = 'Modality')
+
+parser.add_argument('-d', action='store_true', help='Descriptor to extract according to')
 parser.add_argument('-e', help='Experiment number')
 parser.add_argument('-f', nargs='+', help='Feature list to be extracted')
-parser.add_argument('-d', help='Descriptor to extract according to')
-parser.add_argument('-a', help='Activity to be searched')
-parser.add_argument('-o', help='Specify output directory')
 
 ###################
 global args
-global dataset_cfg_dir, data_cfg, output_dir
+global dataset_cfg_dir 
+global data_cfg 
+global output_dir
 
 ###################
+def oddet_clean():
+    logging.info("Cleaning output directory")
+    with open('configs/config.yml', 'r') as f:
+        oddet_config = yaml.full_load(f)
+
+    output = oddet_config["output_dir"]
+    if os.path.exists(output):
+        shutil.rmtree(output)
+        os.mkdir(output)
+    
+    logging.info("Output directory cleaned. Exiting")
+    exit()
+
 
 def configure():
     if len(sys.argv) > 3:
@@ -143,7 +156,17 @@ def read_config():
 #############################################################################
 
 
-def oddet_get():
+def complex_retrieval_d():
+    logging.info("Retrieving based on descriptor")
+    return
+
+
+def complex_retrieval_f():
+    logging.info("Retrieving specified features")
+    return
+
+
+def oddet_modality_get():
     if (len(sys.argv) < 3):
         logging.error("Not enough arguments. For usage, use flag -h.")
         return
@@ -152,13 +175,15 @@ def oddet_get():
     descriptor = False
     dataset_string = ""
 
-    if not (args.m == None): 
+    # Selecting modality
+    if args.m is not None: 
         set_dir = dataset_cfg_dir+'/'+ args.m + '/'
         set_cfg_string = 'configs/sets/' + args.m + '.yml'
     else: 
-        logging.error("No modality listed, exiting.")
+        logging.error("No modality selected, exiting.")
         exit()
 
+    # Finding modality config
     if os.path.isfile(set_cfg_string): 
         logging.info("Dataset config found")
         temp_cfg = open(set_cfg_string, 'r')
@@ -167,14 +192,19 @@ def oddet_get():
         logging.error("No dataset config specified. Exiting.")
         exit()
 
-    if not (args.e == None):
+    # Retrieve based on dataset descriptor
+    if args.d is True:
+        complex_retrieval_d()
+        exit()
+
+    # Retrieve based on experiment number
+    if args.e is not None:
         dataset_string = set_dir + args.m + '_exp' + args.e + data_cfg["filetype"]
         if os.path.isfile(dataset_string):
             logging.info("Dataset found")         
         else:
             logging.error("Dataset for not found, ensure file location is correct. Exiting.")
             exit()
-
     else: 
         logging.info("No experiments specified")
         prompt = input ("Do you want to retrieve all sets from " + args.m + "? [y/N]: ")
@@ -192,8 +222,9 @@ def oddet_get():
             exit()
         
             
-
-    if (args.f == None) and (args.d == None):
+    # Retrieve if only modality is selected
+    # Retrieves the entire set for the modality
+    if (args.f is None) and (args.d is not True) and (args.e is not None):
         logging.info("Retrieving entire set of " + args.m + '_exp' + args.e)
         prompt = input("Do you want to retrieve the whole set? [y/N]: ")
         if prompt == ('y' or 'Y'): 
@@ -206,14 +237,10 @@ def oddet_get():
             logging.info("Nothing retrieved. Exiting.")
             exit()
 
-    elif (args.f != None):
-        logging.info("Retrieving set of features")
+    elif (args.f is not  None) and (args.d is not True):
+        complex_retrieval_f()
 
     return
-
-
-
-
 
 
 
@@ -222,7 +249,7 @@ def oddet_get():
 ####################################################################
 
 def main():
-    print("***** ODDET Extraction Tool *****")
+    print("\n***** ODDET Extraction Tool *****")
     global args
     if len(sys.argv) < 2:
         parser.print_help()
@@ -232,11 +259,17 @@ def main():
 
     if args.config is True:
         configure()
+    
+    if args.clean is True:
+        oddet_clean()
 
     read_config()
+
+    if args.m is not None:
+        oddet_modality_get()
+
     oddet_get()
 
 if __name__ == "__main__":
     main()
-    print('')
     exit()
