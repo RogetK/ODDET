@@ -1,6 +1,6 @@
 ---
 name: wificsi1 
-filetype: .mat
+filetype: .csv.gz
 
 identifiers:
   - timestamp

@@ -269,7 +269,7 @@ def oddet_m_d():
             for file in os.listdir(set_dir):
                 newfile = os.path.splitext(file)[0] + "_descriptor" + data_cfg["filetype"]
                 processed = pandas.read_csv(set_dir + '/' + file, 
-                    usecols=descriptor["identifiers"] + descriptor["features"], low_memory=True)
+                    usecols= descriptor["identifiers"] + descriptor["features"], low_memory=True)
                 final_output = final_output_dir + '/' + newfile
                 processed.to_csv(final_output)
                 logging.info("Wrote successfully to " + final_output)
@@ -307,15 +307,25 @@ def oddet_m_e_f():
                 logging.info("Dataset not found, skipping")
                 continue
            
-            if data_cfg["filetype"] == '.csv':
-                filename = m + '_exp' + e + data_cfg["filetype"]
-                final_output = final_output_dir + '/' + filename
-                processed_ef = pandas.read_csv(dataset_string, usecols=data_cfg["identifiers"] + args.f, low_memory=True)
-                processed_ef.to_csv(final_output)
-                logging.info("Wrote successfully to " + final_output)
+            # if data_cfg["filetype"] == '.csv':
+            #     filename = m + '_exp' + e + data_cfg["filetype"]
+            #     final_output = final_output_dir + '/' + filename
+            #     processed_ef = pandas.read_csv(dataset_string, usecols=data_cfg["identifiers"] + args.f, low_memory=True)
+            #     processed_ef.to_csv(final_output)
+            #     logging.info("Wrote successfully to " + final_output)
 
-            if data_cfg["filetype"] == '.mat':
-                logging.info("mat file")
+            if data_cfg["filetype"] == '.csv.gz':
+                logging.info("Compressed CSV")
+            if data_cfg["filetype"] == '.csv':
+                logging.info("CSV file format")
+
+            filename = m + '_exp' + e + data_cfg["filetype"]
+            final_output = final_output_dir + '/' + os.path.splitext(filename)[0]
+            logging.info("Generating output, please wait")
+            processed_ef = pandas.read_csv(dataset_string, usecols=data_cfg["identifiers"] + args.f, compression='gzip', low_memory=True)
+            processed_ef.to_csv(final_output)
+            logging.info("Written successfully, exiting.")
+
     return
 
 
