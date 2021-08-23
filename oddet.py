@@ -38,7 +38,7 @@ parser = argparse.ArgumentParser(description="Tool for data extraction of the Op
 parser.add_argument('-m', help = 'Modality')
 parser.add_argument('-e', help='Experiment number')
 parser.add_argument('-f', nargs='+', help='Feature list to be extracted')
-parser.add_argument('-d', help='Descriptor to extract according to')
+parser.add_argument('-d', action='store_true',help='Descriptor to extract according to')
 parser.add_argument('-a', help='Activity to be searched')
 parser.add_argument('-o', help='Specify output directory')
 
@@ -47,6 +47,7 @@ global args
 global dataset_cfg_dir, data_cfg
 global output_dir
 
+cfg_ext = '.yml'
 ###################
 
 def parse_config():
@@ -93,7 +94,7 @@ def oddet_get():
 
     if not (args.m == None): 
         set_dir = dataset_cfg_dir+'/'+ args.m + '/'
-        set_cfg_string = 'configs/sets/' + args.m + '.yml'
+        set_cfg_string = 'configs/sets/' + args.m + "_cfg" + cfg_ext
     else: 
         logging.error("No modality listed, exiting.")
         return
@@ -127,6 +128,16 @@ def oddet_get():
                 logging.info("Copy successful. Exiting.")
             return
             
+    if (args.d != None):
+        logging.info("Retrieving dataset descriptor")
+        descriptor_string = './descriptors/' + args.m + cfg_ext
+        descriptor_input = open(descriptor_string, 'r')
+        descriptor = yaml.full_load(descriptor_input)
+        # print(descriptor["features"][0])
+        # names =  
+
+        # ds = pandas.read_csv(dataset_string, header=0)
+        return
 
     if (args.f == None) and (args.d == None):
         logging.info("Retrieving entire set of " + args.m + '_exp' + args.e)
@@ -135,7 +146,7 @@ def oddet_get():
             shutil.copy2(dataset_string, output_dir)
             output_file = output_dir+'/'+args.m+'_exp' + args.e + data_cfg["filetype"]
             if os.path.isfile(output_file):
-                logging.info("Dataset written to " + output_file)
+                logging.info("Successfully written to " + output_file)
                 logging.info("Exiting.")
         else:
             logging.info("Nothing retrieved. Exiting.")
@@ -143,6 +154,8 @@ def oddet_get():
 
     elif (args.f != None):
         logging.info("Retrieving set of features")
+    
+
 
     return
 
