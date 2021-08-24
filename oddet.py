@@ -43,8 +43,8 @@ parser = argparse.ArgumentParser(description="Tool for data extraction of the Op
 
 parser.add_argument('-config', action='store_true', help="Configure directories")
 parser.add_argument('-clean', action='store_true', help='Clean output directory')
-parser.add_argument('-m', nargs='+', help = 'Modality')
 
+parser.add_argument('-m', nargs='+', help = 'Modality')
 parser.add_argument('-d', action='store_true', help='Descriptor to extract according to')
 parser.add_argument('-e', nargs='+', help='Experiment number')
 parser.add_argument('-f', nargs='+', help='Feature list to be extracted')
